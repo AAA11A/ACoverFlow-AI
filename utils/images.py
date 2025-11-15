@@ -28,11 +28,31 @@ def generate_cover(file_path, track_title, genre, api_key, check_existing=True, 
     genre_desc = get_genre_description(genre)
     substyle_desc = get_substyle_description(genre, substyle['name'])
     
-    prompt = f"""Create a square album cover (1024×1024) in the {genre} visual style.
+    # Загружаем промпты для жанра
+    from utils.style import get_genre_prompts
+    prompts = get_genre_prompts(genre)
+    
+    if not prompts or len(prompts) == 0:
+        # Fallback на старый промпт
+        prompt = f"""Create a square album cover (1024×1024) in the {genre} visual style.
 Use the substyle: {substyle_desc}.
 Reflect the mood and meaning of the music title: "{track_title}".
 No text, letters, numbers or logos.
 Abstract, atmospheric, soft lighting, high quality."""
+    else:
+        # Выбираем промпт по хэшу названия трека
+        import hashlib
+        hash_value = int(hashlib.md5(track_title.lower().encode('utf-8')).hexdigest(), 16)
+        prompt_index = hash_value % len(prompts)
+        selected_prompt = prompts[prompt_index]
+        
+        # Заменяем плейсхолдеры
+        prompt = selected_prompt.format(
+            genre=genre,
+            genre_desc=genre_desc or genre,
+            substyle_desc=substyle_desc or '',
+            track_title=track_title
+        )
     
     try:
         client = OpenAI(api_key=api_key)

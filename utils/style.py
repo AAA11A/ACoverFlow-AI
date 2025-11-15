@@ -75,3 +75,12 @@ def get_substyle_description(genre, substyle_name):
     
     return None
 
+
+def get_genre_prompts(genre):
+    """Получает список промптов для жанра"""
+    genres = load_genres()
+    
+    if genre not in genres:
+        return []
+    
+    return genres[genre].get('prompts', [])

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACoverFlow AI - Промпты</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        header h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        nav a {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 15px;
+            box-shadow: 0 4px 8px rgba(79, 172, 254, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-block;
+        }
+        nav a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(79, 172, 254, 0.5);
+        }
+        nav a:active {
+            transform: translateY(0);
+        }
+        nav a.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+        }
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 24px;
+            }
+            nav {
+                flex-direction: column;
+            }
+            nav a {
+                width: 100%;
+            }
+        }
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ACoverFlow AI</h1>
+            <nav>
+                <a href="/">Главная</a>
+                <a href="/editor">Редактор</a>
+                <a href="/prompts" class="active">Промпты</a>
+            </nav>
+        </header>
+
+        <main>
+            <div class="prompt-management-section" style="margin-top: 30px; padding: 25px; background: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <h3 style="margin-top: 0; color: #1565c0; font-weight: 600; margin-bottom: 20px; font-size: 24px;">Управление промптами для генерации обложек</h3>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #1565c0; font-size: 16px;">Выберите жанр:</label>
+                    <select id="prompt-genre-select" style="width: 100%; padding: 12px; border: 2px solid #90caf9; border-radius: 8px; background: white; font-size: 14px; cursor: pointer;">
+                        <option value="">Выберите жанр</option>
+                        {% for genre in genres %}
+                        <option value="{{ genre }}">{{ genre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div id="prompts-editor" style="display: none;">
+                    <div style="margin-bottom: 15px; padding: 15px; background: rgba(255, 255, 255, 0.7); border-radius: 8px; border: 2px solid #e3f2fd;">
+                        <p style="margin: 0 0 10px 0; color: #1565c0; font-weight: 600; font-size: 14px;">Используйте переменные в промптах:</p>
+                        <p style="margin: 0; color: #546e7a; font-size: 13px; line-height: 1.6;">
+                            <code style="background: #fff; padding: 3px 8px; border-radius: 4px; font-family: monospace; font-size: 12px;">{genre}</code> - название жанра<br>
+                            <code style="background: #fff; padding: 3px 8px; border-radius: 4px; font-family: monospace; font-size: 12px;">{genre_desc}</code> - описание жанра<br>
+                            <code style="background: #fff; padding: 3px 8px; border-radius: 4px; font-family: monospace; font-size: 12px;">{substyle_desc}</code> - описание подстиля<br>
+                            <code style="background: #fff; padding: 3px 8px; border-radius: 4px; font-family: monospace; font-size: 12px;">{track_title}</code> - название трека
+                        </p>
+                    </div>
+                    
+                    <div id="prompts-list" style="display: flex; flex-direction: column; gap: 15px;">
+                        <!-- Промпты будут загружаться динамически -->
+                    </div>
+                    
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button type="button" id="add-prompt-btn" style="padding: 12px 24px; background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3); transition: transform 0.2s;">+ Добавить промпт</button>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px; margin-top: 20px;">
+                        <button type="button" id="save-prompts-btn" style="flex: 1; padding: 12px 24px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; box-shadow: 0 4px 8px rgba(79, 172, 254, 0.4); transition: transform 0.2s;">Сохранить промпты</button>
+                        <button type="button" id="reset-prompts-btn" style="flex: 1; padding: 12px 24px; background: linear-gradient(135deg, #78909c 0%, #546e7a 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; transition: transform 0.2s;">Сбросить изменения</button>
+                    </div>
+                    
+                    <div id="prompts-status" style="margin-top: 15px;"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/prompts.js"></script>
+</body>
+</html>
+

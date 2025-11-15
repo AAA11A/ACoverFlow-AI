@@ -130,13 +130,38 @@
             <nav>
                 <a href="/" class="active">Главная</a>
                 <a href="/editor">Редактор</a>
+                <a href="/prompts">Промпты</a>
             </nav>
         </header>
 
         <main>
             <div class="genre-management-section" style="margin-bottom: 30px; padding: 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);">
                 <h3 style="color: white; margin-bottom: 20px; font-size: 24px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Управление жанрами</h3>
-                <button id="show-create-genre-btn" style="padding: 12px 24px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; box-shadow: 0 4px 8px rgba(79, 172, 254, 0.4); transition: transform 0.2s, box-shadow 0.2s;">Создать новый жанр</button>
+                
+                <div style="display: flex; gap: 12px; margin-bottom: 25px; flex-wrap: wrap;">
+                    <button id="show-create-genre-btn" style="padding: 12px 24px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; box-shadow: 0 4px 8px rgba(79, 172, 254, 0.4); transition: transform 0.2s, box-shadow 0.2s;">Создать новый жанр</button>
+                </div>
+                
+                <div id="genres-list-section" style="margin-top: 25px; padding: 20px; background: rgba(255, 255, 255, 0.1); border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.2);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" id="genres-list-toggle">
+                        <h4 style="color: white; margin: 0; font-size: 18px; font-weight: 600;">Существующие жанры:</h4>
+                        <span id="genres-list-arrow" style="color: white; font-size: 20px; font-weight: bold; transition: transform 0.3s;">▼</span>
+                    </div>
+                    <div id="genres-list-container" style="display: none; margin-top: 15px;">
+                        <div id="genres-list" style="display: flex; flex-direction: column; gap: 10px;">
+                            {% for genre in genres %}
+                            <div class="genre-item" data-genre="{{ genre }}" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(255, 255, 255, 0.15); border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                                <div style="flex: 1;">
+                                    <span style="color: white; font-weight: 600; font-size: 15px;">{{ genre }}</span>
+                                    <span style="color: rgba(255, 255, 255, 0.8); font-size: 13px; margin-left: 10px;">({{ genres_data[genre].description if genres_data[genre].description else 'Без описания' }})</span>
+                                </div>
+                                <button type="button" class="delete-genre-btn" data-genre="{{ genre }}" style="padding: 8px 16px; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; box-shadow: 0 2px 4px rgba(238, 90, 111, 0.3); transition: transform 0.2s;">Удалить</button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div id="genre-delete-status" style="margin-top: 15px;"></div>
+                    </div>
+                </div>
                 
                 <div id="create-genre-form" style="display: none; margin-top: 25px; padding: 25px; background: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 2px solid rgba(79, 172, 254, 0.3);">
                     <h4 style="color: #1565c0; margin-bottom: 20px; font-size: 20px; font-weight: bold;">Создание нового жанра</h4>

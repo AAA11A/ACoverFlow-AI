@@ -49,7 +49,7 @@ def get_file_path(relative_path, folder):
 async def index(request: Request):
     genres_data = load_genres()
     genres = list(genres_data.keys())
-    return templates.TemplateResponse("index.html", {"request": request, "genres": genres})
+    return templates.TemplateResponse("index.html", {"request": request, "genres": genres, "genres_data": genres_data})
 
 
 @app.get("/files")
@@ -703,6 +703,52 @@ async def process_selected_files(files: str = Form(...)):
     })
 
 
+@app.get("/prompts", response_class=HTMLResponse)
+async def prompts_page(request: Request):
+    """Страница управления промптами"""
+    genres_data = load_genres()
+    genres = list(genres_data.keys())
+    return templates.TemplateResponse("prompts.html", {"request": request, "genres": genres})
+
+@app.get("/prompts/{genre}")
+async def get_genre_prompts(genre: str):
+    """Получить промпты для жанра"""
+    from utils.style import get_genre_prompts
+    prompts = get_genre_prompts(genre)
+    return JSONResponse(content={"prompts": prompts, "genre": genre})
+
+@app.post("/save-prompts")
+async def save_prompts(
+    genre: str = Form(...),
+    prompts: str = Form(...)  # JSON массив промптов
+):
+    """Сохранить промпты для жанра"""
+    import json
+    genres_data = load_genres()
+    
+    if genre not in genres_data:
+        raise HTTPException(status_code=400, detail="Жанр не найден")
+    
+    try:
+        prompts_list = json.loads(prompts)
+        if not isinstance(prompts_list, list):
+            raise HTTPException(status_code=400, detail="Промпты должны быть массивом")
+        
+        genres_data[genre]['prompts'] = prompts_list
+        
+        with open('genres.json', 'w', encoding='utf-8') as f:
+            json.dump(genres_data, f, ensure_ascii=False, indent=2)
+        
+        return JSONResponse(content={
+            "success": True,
+            "message": f"Промпты для жанра '{genre}' сохранены",
+            "count": len(prompts_list)
+        })
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Неверный формат JSON")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Ошибка сохранения: {str(e)}")
+
 @app.get("/editor", response_class=HTMLResponse)
 async def editor(request: Request):
     genres_data = load_genres()
@@ -749,9 +795,11 @@ async def create_genre(
             "Default Style 4": "Default description for style 4."
         }
     
+    # Создаем жанр с пустым массивом промптов
     genres_data[name] = {
         "description": description.strip() if description else "",
-        "substyles": substyles_dict
+        "substyles": substyles_dict,
+        "prompts": []  # Пустой массив промптов, пользователь добавит их через интерфейс
     }
     
     try:
@@ -767,6 +815,33 @@ async def create_genre(
         })
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка создания жанра: {str(e)}")
+
+@app.delete("/delete-genre/{genre_name}")
+async def delete_genre(genre_name: str):
+    """Удалить жанр и все связанные данные"""
+    genres_data = load_genres()
+    
+    if genre_name not in genres_data:
+        raise HTTPException(status_code=404, detail=f"Жанр '{genre_name}' не найден")
+    
+    genre_folder = os.path.join(OUTPUT_FOLDER, genre_name)
+    
+    try:
+        if os.path.exists(genre_folder):
+            shutil.rmtree(genre_folder)
+        
+        del genres_data[genre_name]
+        
+        import json
+        with open('genres.json', 'w', encoding='utf-8') as f:
+            json.dump(genres_data, f, ensure_ascii=False, indent=2)
+        
+        return JSONResponse(content={
+            "success": True,
+            "message": f"Жанр '{genre_name}' и все связанные данные успешно удалены"
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Ошибка при удалении жанра: {str(e)}")
 
 
 if __name__ == '__main__':
