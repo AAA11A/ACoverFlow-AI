@@ -16,8 +16,8 @@ import shutil
 
 load_dotenv()
 
-MUSIC_FOLDER = os.getenv('MUSIC_FOLDER', 'D:\\music_source')
-OUTPUT_FOLDER = os.getenv('OUTPUT_FOLDER', 'D:\\music_with_covers')
+MUSIC_FOLDER = os.getenv('MUSIC_FOLDER', os.path.join(os.path.expanduser('~'), 'music_source'))
+OUTPUT_FOLDER = os.getenv('OUTPUT_FOLDER', os.path.join(os.path.expanduser('~'), 'music_with_covers'))
 WEB_PORT = int(os.getenv('WEB_PORT', '3003'))
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
 
