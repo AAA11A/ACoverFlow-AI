@@ -291,10 +291,12 @@ function deleteCovers(files) {
 }
 
 function uploadCovers(files, coverFile) {
+    const imageFormat = document.getElementById('editor-cover-format') ? document.getElementById('editor-cover-format').value : 'jpeg';
     return files.map(file => {
         const formData = new FormData();
         formData.append('file', file);
         formData.append('cover_file', coverFile);
+        formData.append('image_format', imageFormat);
         return fetch('/upload-cover', {
             method: 'POST',
             body: formData
@@ -320,10 +322,12 @@ function generateCovers(files) {
         const trackTitle = file.title || filePath.split(/[/\\]/).pop().replace(/\.mp3$/i, '');
         const genre = file.genre || document.getElementById('genre-select').value || 'Ambient';
         
+        const imageFormat = document.getElementById('editor-cover-format') ? document.getElementById('editor-cover-format').value : 'jpeg';
         const formData = new FormData();
         formData.append('file', filePath);
         formData.append('track_title', trackTitle);
         formData.append('genre', genre);
+        formData.append('image_format', imageFormat);
         
         return fetch('/generate-cover', {
             method: 'POST',

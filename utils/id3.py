@@ -76,7 +76,15 @@ def has_cover(file_path):
         return False
 
 
-def embed_cover(file_path, cover_data):
+def embed_cover(file_path, cover_data, image_format='jpeg'):
+    """
+    Встраивает обложку в MP3 файл
+    
+    Args:
+        file_path: путь к MP3 файлу
+        cover_data: бинарные данные обложки
+        image_format: формат изображения ('jpeg' или 'png')
+    """
     try:
         audio = MP3(file_path, ID3=ID3)
         if audio.tags is None:
@@ -84,9 +92,15 @@ def embed_cover(file_path, cover_data):
         
         audio.tags.delall('APIC')
         
+        # Определяем MIME-тип в зависимости от формата
+        if image_format.lower() == 'png':
+            mime_type = 'image/png'
+        else:
+            mime_type = 'image/jpeg'
+        
         audio.tags.add(APIC(
             encoding=3,
-            mime='image/jpeg',
+            mime=mime_type,
             type=3,
             desc='Cover',
             data=cover_data

@@ -156,7 +156,8 @@ async def edit_tags(
 @app.post("/upload-cover")
 async def upload_cover(
     file: str = Form(...),
-    cover_file: UploadFile = File(...)
+    cover_file: UploadFile = File(...),
+    image_format: str = Form('jpeg')
 ):
     folder = OUTPUT_FOLDER if os.path.exists(OUTPUT_FOLDER) else MUSIC_FOLDER
     file_path = get_file_path(file, folder)
@@ -164,13 +165,17 @@ async def upload_cover(
     if not file_path:
         raise HTTPException(status_code=404, detail="Файл не найден")
     
+    # Валидация формата
+    if image_format.lower() not in ['jpeg', 'png']:
+        image_format = 'jpeg'
+    
     cover_data = await cover_file.read()
     
-    resized_data = resize_image(cover_data)
+    resized_data = resize_image(cover_data, image_format)
     if not resized_data:
         raise HTTPException(status_code=500, detail="Ошибка обработки изображения")
     
-    if embed_cover(file_path, resized_data):
+    if embed_cover(file_path, resized_data, image_format):
         return JSONResponse(content={"success": True, "message": "Обложка загружена"})
     else:
         raise HTTPException(status_code=500, detail="Ошибка загрузки обложки")
@@ -194,7 +199,8 @@ async def delete_cover_endpoint(file: str = Form(...)):
 async def generate_cover_endpoint(
     file: str = Form(...),
     track_title: str = Form(...),
-    genre: str = Form(...)
+    genre: str = Form(...),
+    image_format: str = Form('jpeg')
 ):
     if not OPENAI_API_KEY:
         raise HTTPException(status_code=500, detail="OPENAI_API_KEY не установлен")
@@ -205,10 +211,14 @@ async def generate_cover_endpoint(
     if not file_path:
         raise HTTPException(status_code=404, detail="Файл не найден")
     
-    cover_data = generate_cover(file_path, track_title, genre, OPENAI_API_KEY, check_existing=False)
+    # Валидация формата
+    if image_format.lower() not in ['jpeg', 'png']:
+        image_format = 'jpeg'
+    
+    cover_data = generate_cover(file_path, track_title, genre, OPENAI_API_KEY, check_existing=False, image_format=image_format)
     
     if cover_data:
-        if embed_cover(file_path, cover_data):
+        if embed_cover(file_path, cover_data, image_format):
             return JSONResponse(content={"success": True, "message": "Обложка сгенерирована"})
         else:
             raise HTTPException(status_code=500, detail="Ошибка встраивания обложки")
@@ -219,7 +229,8 @@ async def generate_cover_endpoint(
 @app.post("/upload-multiple")
 async def upload_multiple_files(
     files: List[UploadFile] = File(...),
-    genre: str = Form(...)
+    genre: str = Form(...),
+    image_format: str = Form('jpeg')
 ):
     """Загрузка и обработка файлов одновременно"""
     if not OPENAI_API_KEY:
@@ -282,11 +293,15 @@ async def upload_multiple_files(
                     errors.append(f"{file.filename}: Ошибка записи тегов")
                     continue
             
+            # Валидация формата
+            if image_format.lower() not in ['jpeg', 'png']:
+                image_format = 'jpeg'
+            
             # Генерируем обложку, если её нет
             if not has_cover(file_path):
-                cover_data = generate_cover(file_path, title, genre, OPENAI_API_KEY)
+                cover_data = generate_cover(file_path, title, genre, OPENAI_API_KEY, image_format=image_format)
                 if cover_data:
-                    embed_cover(file_path, cover_data)
+                    embed_cover(file_path, cover_data, image_format)
             
             rel_path = get_relative_path(file_path, OUTPUT_FOLDER)
             
@@ -316,7 +331,8 @@ async def upload_file(
     file: UploadFile = File(...),
     genre: str = Form(...),
     use_custom_cover: str = Form('false'),
-    cover: UploadFile = File(None)
+    cover: UploadFile = File(None),
+    image_format: str = Form('jpeg')
 ):
     if not file.filename.lower().endswith('.mp3'):
         raise HTTPException(status_code=400, detail="Разрешены только MP3 файлы")
@@ -378,6 +394,10 @@ async def upload_file(
             if not result:
                 raise HTTPException(status_code=500, detail="Ошибка записи тегов")
         
+        # Валидация формата
+        if image_format.lower() not in ['jpeg', 'png']:
+            image_format = 'jpeg'
+        
         # Обработка обложки
         use_custom = use_custom_cover.lower() == 'true'
         
@@ -386,16 +406,16 @@ async def upload_file(
             if cover and cover.filename:
                 cover_data = await cover.read()
                 if cover_data:
-                    resized_data = resize_image(cover_data)
+                    resized_data = resize_image(cover_data, image_format)
                     if resized_data:
-                        embed_cover(file_path, resized_data)
+                        embed_cover(file_path, resized_data, image_format)
             # Если обложка не загружена - оставляем файл без обложки
         else:
             # Генерируем обложку через ИИ, если её нет
             if not has_cover(file_path):
-                cover_data = generate_cover(file_path, title, genre, OPENAI_API_KEY)
+                cover_data = generate_cover(file_path, title, genre, OPENAI_API_KEY, image_format=image_format)
                 if cover_data:
-                    embed_cover(file_path, cover_data)
+                    embed_cover(file_path, cover_data, image_format)
         
         rel_path = get_relative_path(file_path, OUTPUT_FOLDER)
         
@@ -409,7 +429,7 @@ async def upload_file(
         raise HTTPException(status_code=500, detail=f"Ошибка обработки файла: {str(e)}")
 
 
-def process_file_in_place(file_path, genre):
+def process_file_in_place(file_path, genre, image_format='jpeg'):
     """
     Обрабатывает файл на месте (без копирования): обновляет теги, генерирует обложку если её нет.
     Не перезаписывает обложку, если она уже существует.
@@ -461,11 +481,15 @@ def process_file_in_place(file_path, genre):
         if tags_to_write:
             write_tags(file_path, tags_to_write)
         
+        # Валидация формата
+        if image_format.lower() not in ['jpeg', 'png']:
+            image_format = 'jpeg'
+        
         # Генерируем обложку, если её нет
         if not has_cover(file_path):
-            cover_data = generate_cover(file_path, title, genre, OPENAI_API_KEY)
+            cover_data = generate_cover(file_path, title, genre, OPENAI_API_KEY, image_format=image_format)
             if cover_data:
-                embed_cover(file_path, cover_data)
+                embed_cover(file_path, cover_data, image_format)
         
         return True, "Файл успешно обработан"
         
@@ -473,7 +497,7 @@ def process_file_in_place(file_path, genre):
         return False, str(e)
 
 
-def process_single_file(file_path, genre, source_folder=MUSIC_FOLDER, output_folder=OUTPUT_FOLDER):
+def process_single_file(file_path, genre, source_folder=MUSIC_FOLDER, output_folder=OUTPUT_FOLDER, image_format='jpeg'):
     """
     Обрабатывает один файл: копирует, заполняет теги, генерирует обложку.
     Не перезаписывает файл, если он уже существует и имеет обложку.
@@ -547,11 +571,15 @@ def process_single_file(file_path, genre, source_folder=MUSIC_FOLDER, output_fol
         if tags_to_write:
             write_tags(output_path, tags_to_write)
         
+        # Валидация формата
+        if image_format.lower() not in ['jpeg', 'png']:
+            image_format = 'jpeg'
+        
         # Генерируем обложку, если её нет
         if not has_cover(output_path):
-            cover_data = generate_cover(output_path, title, genre, OPENAI_API_KEY)
+            cover_data = generate_cover(output_path, title, genre, OPENAI_API_KEY, image_format=image_format)
             if cover_data:
-                embed_cover(output_path, cover_data)
+                embed_cover(output_path, cover_data, image_format)
         
         return True, "Файл успешно обработан"
         

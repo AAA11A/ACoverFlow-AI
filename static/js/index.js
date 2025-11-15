@@ -271,24 +271,26 @@ function handleUpload(event) {
     const isMultiple = files.length > 1;
     const useCustomCover = document.getElementById('use-custom-cover').checked;
     const coverFile = useCustomCover ? document.getElementById('cover-input').files[0] : null;
+    const imageFormat = document.getElementById('cover-format') ? document.getElementById('cover-format').value : 'jpeg';
     
     uploadBtn.disabled = true;
     progressDiv.innerHTML = '';
     
     if (isMultiple) {
         // Обработка нескольких файлов
-        handleMultipleUpload(files, genreSelect.value, useCustomCover, coverFile, statusDiv, progressDiv, uploadBtn, fileInput, genreSelect);
+        handleMultipleUpload(files, genreSelect.value, useCustomCover, coverFile, imageFormat, statusDiv, progressDiv, uploadBtn, fileInput, genreSelect);
     } else {
         // Обработка одного файла (старый способ)
-        handleSingleUpload(files[0], genreSelect.value, useCustomCover, coverFile, statusDiv, uploadBtn, fileInput, genreSelect);
+        handleSingleUpload(files[0], genreSelect.value, useCustomCover, coverFile, imageFormat, statusDiv, uploadBtn, fileInput, genreSelect);
     }
 }
 
-function handleSingleUpload(file, genre, useCustomCover, coverFile, statusDiv, uploadBtn, fileInput, genreSelect) {
+function handleSingleUpload(file, genre, useCustomCover, coverFile, imageFormat, statusDiv, uploadBtn, fileInput, genreSelect) {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('genre', genre);
     formData.append('use_custom_cover', useCustomCover ? 'true' : 'false');
+    formData.append('image_format', imageFormat);
     
     if (useCustomCover && coverFile) {
         formData.append('cover', coverFile);
@@ -326,7 +328,7 @@ function handleSingleUpload(file, genre, useCustomCover, coverFile, statusDiv, u
     });
 }
 
-async function handleMultipleUpload(files, genre, useCustomCover, coverFile, statusDiv, progressDiv, uploadBtn, fileInput, genreSelect) {
+async function handleMultipleUpload(files, genre, useCustomCover, coverFile, imageFormat, statusDiv, progressDiv, uploadBtn, fileInput, genreSelect) {
     showUploadStatus(`Загрузка и обработка ${files.length} файлов...`, 'progress');
     
     // Показываем список файлов для обработки
@@ -357,6 +359,7 @@ async function handleMultipleUpload(files, genre, useCustomCover, coverFile, sta
             formData.append('file', file);
             formData.append('genre', genre);
             formData.append('use_custom_cover', useCustomCover ? 'true' : 'false');
+            formData.append('image_format', imageFormat);
             
             if (useCustomCover && coverFile) {
                 formData.append('cover', coverFile);

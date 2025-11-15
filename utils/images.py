@@ -6,7 +6,18 @@ from PIL import Image
 from io import BytesIO
 
 
-def generate_cover(file_path, track_title, genre, api_key, check_existing=True):
+def generate_cover(file_path, track_title, genre, api_key, check_existing=True, image_format='jpeg'):
+    """
+    Генерирует обложку через OpenAI API
+    
+    Args:
+        file_path: путь к MP3 файлу
+        track_title: название трека
+        genre: жанр
+        api_key: OpenAI API ключ
+        check_existing: проверять ли наличие существующей обложки
+        image_format: формат изображения ('jpeg' или 'png')
+    """
     if check_existing and has_cover(file_path):
         return None
     
@@ -42,15 +53,22 @@ Abstract, atmospheric, soft lighting, high quality."""
         
         img = Image.open(BytesIO(img_response.content))
         
-        if img.mode != 'RGB':
-            img = img.convert('RGB')
-        
         max_size = 800
         if img.width > max_size or img.height > max_size:
             img.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
         
         output = BytesIO()
-        img.save(output, format='JPEG', quality=85, optimize=True)
+        
+        # Сохраняем в выбранном формате
+        if image_format.lower() == 'png':
+            if img.mode != 'RGBA':
+                img = img.convert('RGBA')
+            img.save(output, format='PNG', optimize=True)
+        else:
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
+            img.save(output, format='JPEG', quality=85, optimize=True)
+        
         output.seek(0)
         
         return output.getvalue()
@@ -58,19 +76,33 @@ Abstract, atmospheric, soft lighting, high quality."""
         return None
 
 
-def resize_image(image_data):
+def resize_image(image_data, image_format='jpeg'):
+    """
+    Изменяет размер изображения и конвертирует в нужный формат
+    
+    Args:
+        image_data: бинарные данные изображения
+        image_format: формат вывода ('jpeg' или 'png')
+    """
     try:
         img = Image.open(BytesIO(image_data))
-        
-        if img.mode != 'RGB':
-            img = img.convert('RGB')
         
         max_size = 800
         if img.width > max_size or img.height > max_size:
             img.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
         
         output = BytesIO()
-        img.save(output, format='JPEG', quality=85, optimize=True)
+        
+        # Сохраняем в выбранном формате
+        if image_format.lower() == 'png':
+            if img.mode != 'RGBA':
+                img = img.convert('RGBA')
+            img.save(output, format='PNG', optimize=True)
+        else:
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
+            img.save(output, format='JPEG', quality=85, optimize=True)
+        
         output.seek(0)
         
         return output.getvalue()
