@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACoverFlow AI - Главная</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        header h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        nav a {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 15px;
+            box-shadow: 0 4px 8px rgba(79, 172, 254, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-block;
+        }
+        nav a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(79, 172, 254, 0.5);
+        }
+        nav a:active {
+            transform: translateY(0);
+        }
+        nav a.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+        }
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 24px;
+            }
+            nav {
+                flex-direction: column;
+            }
+            nav a {
+                width: 100%;
+            }
+            .genre-management-section {
+                padding: 20px !important;
+            }
+            .file-selector {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .file-selector select,
+            .file-selector button {
+                width: 100%;
+            }
+            .substyle-item {
+                flex-direction: column !important;
+            }
+            .substyle-item input {
+                width: 100% !important;
+                margin-bottom: 8px;
+            }
+            #genre-form button {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 20px;
+            }
+            .genre-management-section {
+                padding: 15px !important;
+            }
+        }
+        #show-create-genre-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(79, 172, 254, 0.5) !important;
+        }
+        #show-create-genre-btn:active {
+            transform: translateY(0);
+        }
+        #add-substyle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(33, 150, 243, 0.5) !important;
+        }
+        #add-substyle-btn:active {
+            transform: translateY(0);
+        }
+        #genre-form button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(79, 172, 254, 0.5) !important;
+        }
+        #genre-form button[type="submit"]:active {
+            transform: translateY(0);
+        }
+        #cancel-create-genre-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(84, 110, 122, 0.5) !important;
+        }
+        #cancel-create-genre-btn:active {
+            transform: translateY(0);
+        }
+        .remove-substyle-btn:hover {
+            transform: scale(1.05) !important;
+            box-shadow: 0 4px 8px rgba(238, 90, 111, 0.5) !important;
+        }
+        .remove-substyle-btn:active {
+            transform: scale(0.98) !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ACoverFlow AI</h1>
+            <nav>
+                <a href="/" class="active">Главная</a>
+                <a href="/editor">Редактор</a>
+            </nav>
+        </header>
+
+        <main>
+            <div class="genre-management-section" style="margin-bottom: 30px; padding: 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);">
+                <h3 style="color: white; margin-bottom: 20px; font-size: 24px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Управление жанрами</h3>
+                <button id="show-create-genre-btn" style="padding: 12px 24px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; box-shadow: 0 4px 8px rgba(79, 172, 254, 0.4); transition: transform 0.2s, box-shadow 0.2s;">Создать новый жанр</button>
+                
+                <div id="create-genre-form" style="display: none; margin-top: 25px; padding: 25px; background: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 2px solid rgba(79, 172, 254, 0.3);">
+                    <h4 style="color: #1565c0; margin-bottom: 20px; font-size: 20px; font-weight: bold;">Создание нового жанра</h4>
+                    <form id="genre-form">
+                        <div style="margin-bottom: 20px;">
+                            <label for="genre-name" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1565c0;">Название жанра:</label>
+                            <input type="text" id="genre-name" name="name" required style="width: 100%; padding: 12px; border: 2px solid #90caf9; border-radius: 8px; background: white; font-size: 14px; transition: border-color 0.3s, box-shadow 0.3s;" onfocus="this.style.borderColor='#2196F3'; this.style.boxShadow='0 0 0 3px rgba(33, 150, 243, 0.1)';" onblur="this.style.borderColor='#90caf9'; this.style.boxShadow='none';">
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label for="genre-description" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1565c0;">Описание:</label>
+                            <textarea id="genre-description" name="description" required style="width: 100%; padding: 12px; border: 2px solid #90caf9; border-radius: 8px; background: white; min-height: 80px; font-size: 14px; font-family: inherit; resize: vertical; transition: border-color 0.3s, box-shadow 0.3s;" onfocus="this.style.borderColor='#2196F3'; this.style.boxShadow='0 0 0 3px rgba(33, 150, 243, 0.1)';" onblur="this.style.borderColor='#90caf9'; this.style.boxShadow='none';"></textarea>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #1565c0;">Подстили (опционально):</label>
+                            <div id="substyles-container" style="background: #dde8fe; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                                <div class="substyle-item" style="margin-bottom: 12px; display: flex; gap: 10px; align-items: center;">
+                                    <input type="text" placeholder="Название подстиля" class="substyle-name" style="flex: 1; padding: 10px; border: 2px solid #90caf9; border-radius: 6px; background: white; font-size: 14px;">
+                                    <input type="text" placeholder="Описание" class="substyle-desc" style="flex: 2; padding: 10px; border: 2px solid #90caf9; border-radius: 6px; background: white; font-size: 14px;">
+                                    <button type="button" class="remove-substyle-btn" style="padding: 10px 16px; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 4px rgba(238, 90, 111, 0.3); transition: transform 0.2s;">Удалить</button>
+                                </div>
+                            </div>
+                            <button type="button" id="add-substyle-btn" style="padding: 10px 20px; background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3); transition: transform 0.2s, box-shadow 0.2s;">+ Добавить подстиль</button>
+                            <small style="display: block; margin-top: 8px; color: #546e7a; font-style: italic;">Если не указаны, будут созданы подстили по умолчанию</small>
+                        </div>
+                        <div style="display: flex; gap: 12px; margin-top: 25px;">
+                            <button type="submit" style="flex: 1; padding: 12px 24px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; box-shadow: 0 4px 8px rgba(79, 172, 254, 0.4); transition: transform 0.2s, box-shadow 0.2s;">Создать жанр</button>
+                            <button type="button" id="cancel-create-genre-btn" style="flex: 1; padding: 12px 24px; background: linear-gradient(135deg, #78909c 0%, #546e7a 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; box-shadow: 0 4px 8px rgba(84, 110, 122, 0.3); transition: transform 0.2s, box-shadow 0.2s;">Отмена</button>
+                        </div>
+                    </form>
+                    <div id="genre-status" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+
+            <div class="upload-section">
+                <h3>Загрузка файлов</h3>
+                <form id="upload-form" enctype="multipart/form-data">
+                    <div class="upload-controls">
+                        <input type="file" id="file-input" accept=".mp3" multiple required>
+                        <select id="upload-genre" required>
+                            <option value="">Выберите жанр</option>
+                            {% for genre in genres %}
+                            <option value="{{ genre }}">{{ genre }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" id="upload-btn">Загрузить и обработать</button>
+                    </div>
+                    <div class="cover-option">
+                        <label>
+                            <input type="checkbox" id="use-custom-cover">
+                            Использовать свою обложку вместо ИИ
+                        </label>
+                        <div id="custom-cover-upload" style="display: none; margin-top: 10px;">
+                            <input type="file" id="cover-input" accept="image/*">
+                            <small style="display: block; margin-top: 5px; color: #666;">Если не загружено, файлы останутся без обложки</small>
+                        </div>
+                    </div>
+                    <div id="upload-status" class="upload-status"></div>
+                    <div id="upload-progress" class="upload-progress"></div>
+                </form>
+            </div>
+
+            <div class="auto-process-section">
+                <h3>Автоматическая обработка</h3>
+                <p>Обработать все файлы из папки источника (MUSIC_FOLDER) и сохранить в папку вывода (OUTPUT_FOLDER)</p>
+                <button id="process-all-btn" class="process-btn">Запустить автоматическую обработку</button>
+                <div id="process-status" class="process-status"></div>
+            </div>
+
+            <div class="genre-selector">
+                <label for="genre-filter">Фильтр по жанру:</label>
+                <select id="genre-filter">
+                    <option value="">Все жанры</option>
+                    {% for genre in genres %}
+                    <option value="{{ genre }}">{{ genre }}</option>
+                    {% endfor %}
+                </select>
+                <button id="load-files">Загрузить файлы</button>
+            </div>
+
+            <div class="files-container">
+                <div class="files-header">
+                    <input type="checkbox" id="select-all">
+                    <label for="select-all">Выбрать все</label>
+                    <span id="selected-count">Выбрано: 0</span>
+                    <button id="process-selected-btn" class="process-selected-btn" disabled>Обработать выбранные</button>
+                </div>
+
+                <div id="files-list" class="files-list">
+                    <p>Нажмите "Загрузить файлы" для отображения списка</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/index.js"></script>
+</body>
+</html>
+

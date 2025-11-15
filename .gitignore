@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Environment variables
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Music files (too large for git)
+*.mp3
+*.wav
+*.flac
+*.m4a
+
+# Music folders
+music_source/
+music_with_covers/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+

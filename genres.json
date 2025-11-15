@@ -1,0 +1,128 @@
+{
+  "Ambient": {
+    "description": "туман, холодные тона, мягкая дымка",
+    "substyles": {
+      "Diffuse Mist": "Soft blurry shapes, neutral tones, gentle diffused gradients.",
+      "Soft Horizon": "Subtle repeating abstract patterns with very low contrast.",
+      "Deep Blur": "Large soft color blocks with smooth edges, minimalist and neutral.",
+      "Particle Glow": "Soft flowing curves with muted colors and minimal motion."
+    }
+  },
+  "Chillout": {
+    "description": "тёплые пастельные волны, текучие формы",
+    "substyles": {
+      "Warm Waves": "Warm pink, peach and golden soft light.",
+      "Liquid Shapes": "Petal-like forms without literal flowers.",
+      "Soft Circles": "Dim cozy glows like candle haze, blurred lighting.",
+      "Velvet Gradient": "Intertwined smooth curves suggesting closeness."
+    }
+  },
+  "Beautiful Music": {
+    "description": "светлая воздушность, золотистые акценты",
+    "substyles": {
+      "Light Bloom": "Ivory and gold tones, abstract ornament-like shapes.",
+      "Heavenly Glow": "Flowing curved lines suggesting string vibration.",
+      "Crystal Softness": "Soft marble-like textures and classical hall lighting.",
+      "Pure Harmony": "Layered soft shapes reminiscent of sheet music pages."
+    }
+  },
+  "New Age": {
+    "description": "космическая абстракция, мистические линии",
+    "substyles": {
+      "Cosmic Energy": "Rounded resonant forms and warm tonal gradients.",
+      "Mystic Geometry": "Fine linear patterns like strings or frets, softly glowing.",
+      "Deep Space Fog": "Rhythmic dots and blocks forming repeating patterns.",
+      "Spiritual Flow": "Smooth intertwined curves suggesting melodic motion."
+    }
+  },
+  "Background Music": {
+    "description": "Soft, neutral visuals that stay unobtrusive and calm.",
+    "substyles": {
+      "Soft Focus": "Soft blurry shapes, neutral tones, gentle diffused gradients.",
+      "Ambient Patterns": "Subtle repeating abstract patterns with very low contrast.",
+      "Calm Blocks": "Large soft color blocks with smooth edges, minimalist and neutral.",
+      "Neutral Flow": "Soft flowing curves with muted colors and minimal motion."
+    }
+  },
+  "Classical Music": {
+    "description": "Elegant, refined visuals inspired by classical aesthetics.",
+    "substyles": {
+      "Golden Elegance": "Ivory and gold tones, abstract ornament-like shapes.",
+      "String Resonance": "Flowing curved lines suggesting string vibration.",
+      "Marble Hall": "Soft marble-like textures and classical hall lighting.",
+      "Sheet Echo": "Layered soft shapes reminiscent of sheet music pages."
+    }
+  },
+  "Instrumental Music": {
+    "description": "Abstract representation of instruments and sound textures.",
+    "substyles": {
+      "Resonant Shapes": "Rounded resonant forms and warm tonal gradients.",
+      "Abstract Strings": "Fine linear patterns like strings or frets, softly glowing.",
+      "Percussive Pulses": "Rhythmic dots and blocks forming repeating patterns.",
+      "Melodic Lines": "Smooth intertwined curves suggesting melodic motion."
+    }
+  },
+  "Jazz Music": {
+    "description": "Expressive, rhythmic, slightly unpredictable visual energy.",
+    "substyles": {
+      "Midnight Club": "Deep blues, warm amber, smoky abstract atmosphere.",
+      "Syncopated Shapes": "Broken irregular shapes with syncopated rhythm.",
+      "Sax Echo": "Curved warm-toned forms echoing brass timbre.",
+      "Blue Improvisation": "Loose painterly strokes in blue and purple tones."
+    }
+  },
+  "Lounge Music": {
+    "description": "Modern, stylish, cozy atmosphere with relaxed sophistication.",
+    "substyles": {
+      "Soft Neon": "Soft neon glows with rounded shapes and gradients.",
+      "Velvet Sofa": "Warm muted textures and cozy abstract surfaces.",
+      "Hotel Lobby": "Minimalist light and interior-inspired geometric forms.",
+      "Cocktail Glow": "Warm overlapping translucent shapes with relaxed mood."
+    }
+  },
+  "Relaxation": {
+    "description": "Ultra-calming visuals oriented toward rest and softness.",
+    "substyles": {
+      "Breathing Waves": "Wide gentle waves in very soft tones.",
+      "Pastel Mist": "Cloud-like pastel mist with blurred edges.",
+      "Zen Circles": "Balanced minimal circular shapes and rings.",
+      "Calm Horizon": "Soft horizontal transitions suggesting distant horizons."
+    }
+  },
+  "Romantic Music": {
+    "description": "Warm, intimate, emotional atmosphere in soft tones.",
+    "substyles": {
+      "Warm Glow": "Warm pink, peach and golden soft light.",
+      "Soft Petals": "Petal-like forms without literal flowers.",
+      "Candle Haze": "Dim cozy glows like candle haze, blurred lighting.",
+      "Tender Curves": "Intertwined smooth curves suggesting closeness."
+    }
+  },
+  "Sounds of Nature": {
+    "description": "Abstract representation of natural elements without literal imagery.",
+    "substyles": {
+      "Forest Echo": "Dark green layered organic shapes with depth.",
+      "Ocean Flow": "Blue and turquoise wave-like abstract currents.",
+      "Mountain Air": "Cool angular gradients suggesting elevation.",
+      "Rain Pattern": "Fine soft vertical or diagonal rain-like lines."
+    }
+  },
+  "Trance Music": {
+    "description": "Hypnotic, layered visuals with high energy and repetition.",
+    "substyles": {
+      "Neon Tunnel": "Neon rings forming a tunnel-like perspective.",
+      "Fractal Pulse": "Layered fractal-inspired pulsing forms.",
+      "Laser Waves": "Long bright streaks of colored light.",
+      "Hypnotic Rings": "Concentric soft rings generating trance-like rhythm."
+    }
+  },
+  "Music for Sleeping": {
+    "description": "Very soft, low-contrast visuals designed for rest.",
+    "substyles": {
+      "Night Sky Haze": "Dim star-like dots in deep blue haze.",
+      "Moonlit Gradient": "Dark gradients with faint moonlit glow.",
+      "Dream Fog": "Foggy abstract shapes with desaturated colors.",
+      "Silent Waves": "Barely visible soft wave forms in dark tones."
+    }
+  }
+}

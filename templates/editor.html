@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACoverFlow AI - Редактор</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        header h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        nav a {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 15px;
+            box-shadow: 0 4px 8px rgba(79, 172, 254, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-block;
+        }
+        nav a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(79, 172, 254, 0.5);
+        }
+        nav a:active {
+            transform: translateY(0);
+        }
+        nav a.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+        }
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 24px;
+            }
+            nav {
+                flex-direction: column;
+            }
+            nav a {
+                width: 100%;
+            }
+            .editor-section {
+                padding: 20px !important;
+            }
+            .file-selector {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .file-selector select,
+            .file-selector button {
+                width: 100%;
+            }
+            .cover-actions {
+                flex-direction: column;
+            }
+            .cover-actions label {
+                width: 100%;
+                text-align: center;
+            }
+            .form-group input,
+            .form-group textarea {
+                width: 100%;
+            }
+            #apply-changes-btn {
+                width: 100%;
+            }
+        }
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 20px;
+            }
+            .editor-section {
+                padding: 10px !important;
+            }
+            label[for="select-all-files"] {
+                padding: 6px 10px !important;
+                font-size: 14px;
+            }
+            label[for="select-all-files"] input[type="checkbox"] {
+                order: 2;
+                margin-left: 8px;
+            }
+            label[for="select-all-files"] span {
+                order: 1;
+            }
+            .file-item {
+                flex-direction: row;
+                align-items: flex-start;
+                padding: 8px 8px 8px 4px !important;
+                gap: 8px !important;
+            }
+            .file-item input[type="checkbox"] {
+                margin-top: 5px;
+                margin-left: 2px;
+            }
+            .cover-thumb {
+                width: 110px !important;
+                height: 110px !important;
+                min-height: 110px !important;
+                margin: 0;
+                align-self: flex-start;
+                flex-shrink: 0;
+            }
+            .cover-thumb[style*="display: flex"] {
+                width: 110px !important;
+                height: 110px !important;
+                min-height: 110px !important;
+            }
+            .file-info {
+                flex: 1;
+                gap: 2px !important;
+                padding-left: 4px;
+                min-width: 0;
+            }
+            .file-info h4 {
+                font-size: 13px;
+                margin-bottom: 3px;
+            }
+            .file-tags {
+                gap: 2px !important;
+            }
+            .tag-item {
+                padding: 2px 4px !important;
+                gap: 3px !important;
+                font-size: 10px !important;
+                line-height: 1.1 !important;
+                max-width: 100%;
+            }
+            .tag-label {
+                min-width: 55px !important;
+                font-size: 10px !important;
+            }
+            .tag-value {
+                font-size: 10px !important;
+            }
+        }
+        .editor-section {
+            background: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .file-selector {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .file-selector label {
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        .file-selector select {
+            padding: 10px 15px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.95);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .file-selector select:focus {
+            outline: none;
+            border-color: white;
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.2);
+        }
+        #load-files-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 4px 8px rgba(79, 172, 254, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        #load-files-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(79, 172, 254, 0.5);
+        }
+        #load-files-btn:active {
+            transform: translateY(0);
+        }
+        .selected-files {
+            background: #dde8fe;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .selected-files h3 {
+            color: #1565c0;
+            font-weight: 600;
+        }
+        #selected-summary {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%) !important;
+            border: 2px solid #90caf9;
+            color: #1565c0;
+            font-weight: 600;
+        }
+        .tags-editor, .cover-manager {
+            background: #dde8fe;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .tags-editor h3, .cover-manager h3 {
+            color: #1565c0;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1565c0;
+        }
+        .form-group input[type="text"],
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #90caf9;
+            border-radius: 8px;
+            background: white;
+            font-size: 14px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .form-group input[type="text"]:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2196F3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        .cover-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .cover-actions input[type="radio"] {
+            display: none;
+        }
+        .cover-actions label {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: 2px solid #90caf9;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #1565c0;
+            transition: all 0.3s;
+        }
+        .cover-actions input[type="radio"]:checked + label {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            border-color: #1976D2;
+            box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+        }
+        .cover-actions label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(33, 150, 243, 0.2);
+        }
+        #cover-preview {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            border: 2px dashed #90caf9;
+        }
+        #cover-preview img {
+            max-width: 200px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        #apply-changes-btn {
+            padding: 14px 40px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 8px rgba(79, 172, 254, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        #apply-changes-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(79, 172, 254, 0.5);
+        }
+        #apply-changes-btn:active {
+            transform: translateY(0);
+        }
+        .files-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .file-item {
+            background: #dde8fe;
+            border: 2px solid #e3f2fd;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .file-item:hover {
+            border-color: #90caf9;
+            box-shadow: 0 4px 8px rgba(33, 150, 243, 0.2);
+            transform: translateY(-2px);
+        }
+        .file-item input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: #2196F3;
+            margin-top: 10px;
+            flex-shrink: 0;
+            align-self: flex-start;
+        }
+        .cover-thumb {
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid #e3f2fd;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            flex-shrink: 0;
+        }
+        .cover-thumb[style*="display: flex"] {
+            width: 200px;
+            height: 200px;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 12px;
+        }
+        .file-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 0;
+        }
+        .file-info h4 {
+            margin: 0 0 8px 0;
+            color: #1565c0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .file-info p {
+            margin: 0;
+            color: #546e7a;
+            font-size: 13px;
+        }
+        .file-tags {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 0;
+        }
+        .tag-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 6px;
+            border: 1px solid #e3f2fd;
+            font-size: 14px;
+            line-height: 1.4;
+            max-width: 400px;
+        }
+        .tag-label {
+            font-weight: 600;
+            color: #1565c0;
+            min-width: 90px;
+            flex-shrink: 0;
+        }
+        .tag-value {
+            color: #333;
+            flex: 1;
+            word-break: break-word;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        #selected-files-list p {
+            color: #546e7a;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ACoverFlow AI</h1>
+            <nav>
+                <a href="/">Главная</a>
+                <a href="/editor" class="active">Редактор</a>
+            </nav>
+        </header>
+
+        <main>
+            <div class="editor-section">
+                <div class="file-selector">
+                    <label for="genre-select">Жанр:</label>
+                    <select id="genre-select">
+                        <option value="">Все жанры</option>
+                        {% for genre in genres %}
+                        <option value="{{ genre }}">{{ genre }}</option>
+                        {% endfor %}
+                    </select>
+                    <button id="load-files-btn">Загрузить файлы</button>
+                </div>
+
+                <div class="selected-files">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="margin: 0; color: #1565c0; font-weight: 600;">Файлы для редактирования:</h3>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 12px; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 6px; border: 2px solid #90caf9; transition: all 0.3s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 8px rgba(33, 150, 243, 0.2)';" onmouseout="this.style.transform=''; this.style.boxShadow='';">
+                            <input type="checkbox" id="select-all-files" style="width: 18px; height: 18px; cursor: pointer;">
+                            <span style="font-weight: 600; color: #1565c0;">Выбрать все</span>
+                        </label>
+                    </div>
+                    <div id="selected-files-list"></div>
+                    <div id="selected-summary" style="margin-top: 15px; padding: 12px 16px; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border: 2px solid #90caf9; border-radius: 8px; display: none; color: #1565c0; font-weight: 600;">
+                        <strong>Выбрано файлов: <span id="selected-count">0</span></strong>
+                    </div>
+                </div>
+
+                <div class="tags-editor">
+                    <h3>Редактирование тегов:</h3>
+                    <form id="tags-form">
+                        <div class="form-group">
+                            <label for="title">Title (Название):</label>
+                            <input type="text" id="title" name="title">
+                        </div>
+                        <div class="form-group">
+                            <label for="artist">Artist (Исполнитель):</label>
+                            <input type="text" id="artist" name="artist">
+                        </div>
+                        <div class="form-group">
+                            <label for="album">Album (Альбом):</label>
+                            <input type="text" id="album" name="album">
+                        </div>
+                        <div class="form-group">
+                            <label for="genre">Genre (Жанр):</label>
+                            <input type="text" id="genre" name="genre">
+                        </div>
+                        <div class="form-group">
+                            <label for="year">Year (Год):</label>
+                            <input type="text" id="year" name="year">
+                        </div>
+                        <div class="form-group">
+                            <label for="comment">Comment (Комментарий):</label>
+                            <textarea id="comment" name="comment"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="lyrics">Lyrics (Текст песни):</label>
+                            <textarea id="lyrics" name="lyrics"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="original_artist">Original Artist (Оригинальный исполнитель):</label>
+                            <input type="text" id="original_artist" name="original_artist">
+                        </div>
+                        <div class="form-group">
+                            <label for="copyright">Copyright (Авторские права):</label>
+                            <input type="text" id="copyright" name="copyright">
+                        </div>
+                        <div class="form-group">
+                            <label for="encoder">Encoder (Кодировщик):</label>
+                            <input type="text" id="encoder" name="encoder">
+                        </div>
+                    </form>
+                </div>
+
+                <div class="cover-manager">
+                    <h3>Управление обложками:</h3>
+                    <div class="cover-actions">
+                        <input type="radio" id="cover-none" name="cover-action" value="none" checked>
+                        <label for="cover-none">Не менять</label>
+                        
+                        <input type="radio" id="cover-delete" name="cover-action" value="delete">
+                        <label for="cover-delete">Удалить обложку</label>
+                        
+                        <input type="radio" id="cover-upload" name="cover-action" value="upload">
+                        <label for="cover-upload">Загрузить вручную</label>
+                        <input type="file" id="cover-file" accept="image/*" style="display: none;">
+                        
+                        <input type="radio" id="cover-generate" name="cover-action" value="generate">
+                        <label for="cover-generate">Сгенерировать ИИ</label>
+                    </div>
+                    <div id="cover-preview" class="cover-preview"></div>
+                </div>
+
+                <div style="margin-top: 30px; text-align: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);">
+                    <button type="button" id="apply-changes-btn">Применить изменения</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/editor.js"></script>
+</body>
+</html>
+
