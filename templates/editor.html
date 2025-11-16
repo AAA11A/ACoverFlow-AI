@@ -6,6 +6,28 @@
     <title>ACoverFlow AI - Редактор</title>
     <link rel="stylesheet" href="/static/css/style.css">
     <style>
+        header .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        header {
+            position: relative;
+        }
+        header .logo {
+            height: 120px;
+            min-height: 120px;
+            width: auto;
+            object-fit: contain;
+            flex-shrink: 0;
+            position: absolute;
+            left: 20px;
+            bottom: -70px;
+            top: auto;
+        }
         header h1 {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
@@ -13,7 +35,7 @@
             background-clip: text;
             font-size: 32px;
             font-weight: 700;
-            margin-bottom: 20px;
+            margin: 0;
             text-align: center;
         }
         nav {
@@ -46,6 +68,9 @@
             box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
         }
         @media (max-width: 768px) {
+            header .logo {
+                display: none;
+            }
             header h1 {
                 font-size: 24px;
             }
@@ -82,6 +107,9 @@
             }
         }
         @media (max-width: 480px) {
+            header .logo {
+                display: none;
+            }
             header h1 {
                 font-size: 20px;
             }
@@ -434,7 +462,10 @@
 <body>
     <div class="container">
         <header>
-            <h1>ACoverFlow AI</h1>
+            <div class="header-content">
+                <img src="/static/images/ACoverFlow AI.png" alt="ACoverFlow AI Logo" class="logo">
+                <h1>ACoverFlow AI</h1>
+            </div>
             <nav>
                 <a href="/">Главная</a>
                 <a href="/editor" class="active">Редактор</a>

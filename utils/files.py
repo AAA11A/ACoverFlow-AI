@@ -49,3 +49,4 @@ def get_relative_path(file_path, base_folder):
     except ValueError:
         return file_path
 
+
