@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function loadFiles() {
     const genre = document.getElementById('genre-filter').value;
-    const url = genre ? `/files?genre=${encodeURIComponent(genre)}` : '/files';
+    const url = '/files-api' + (genre ? `?genre=${encodeURIComponent(genre)}` : '');
     
     fetch(url)
         .then(response => response.json())

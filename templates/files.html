@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACoverFlow AI - Файлы</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        header h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        nav a {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 15px;
+            box-shadow: 0 4px 8px rgba(79, 172, 254, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-block;
+        }
+        nav a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(79, 172, 254, 0.5);
+        }
+        nav a:active {
+            transform: translateY(0);
+        }
+        nav a.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+        }
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 24px;
+            }
+            nav {
+                flex-direction: column;
+            }
+            nav a {
+                width: 100%;
+            }
+        }
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ACoverFlow AI</h1>
+            <nav>
+                <a href="/">Главная</a>
+                <a href="/editor">Редактор</a>
+                <a href="/prompts">Промпты</a>
+                <a href="/files" class="active">Файлы</a>
+            </nav>
+        </header>
+
+        <main>
+            <div class="files-management-section" style="margin-top: 30px; padding: 25px; background: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <h3 style="margin-top: 0; color: #1565c0; font-weight: 600; margin-bottom: 20px; font-size: 24px;">Управление файлами</h3>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #1565c0; font-size: 16px;">Выберите жанр:</label>
+                    <select id="files-genre-select" style="width: 100%; padding: 12px; border: 2px solid #90caf9; border-radius: 8px; background: white; font-size: 14px; cursor: pointer;">
+                        <option value="">Все жанры</option>
+                        {% for genre in genres %}
+                        <option value="{{ genre }}">{{ genre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <button type="button" id="load-files-btn" style="padding: 12px 24px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; box-shadow: 0 4px 8px rgba(79, 172, 254, 0.4); transition: transform 0.2s;">Загрузить список файлов</button>
+                    <button type="button" id="download-selected-btn" style="padding: 12px 24px; background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; box-shadow: 0 4px 8px rgba(76, 175, 80, 0.4); transition: transform 0.2s; display: none;">Скачать выбранные</button>
+                    <button type="button" id="delete-selected-btn" style="padding: 12px 24px; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; box-shadow: 0 4px 8px rgba(238, 90, 111, 0.3); transition: transform 0.2s; display: none;">Удалить выбранные</button>
+                </div>
+                
+                <div id="files-header" style="display: none; margin-bottom: 15px; padding: 15px; background: rgba(255, 255, 255, 0.7); border-radius: 8px; border: 2px solid #e3f2fd;">
+                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <input type="checkbox" id="select-all-files" style="width: 20px; height: 20px; cursor: pointer;">
+                        <label for="select-all-files" style="font-weight: 600; color: #1565c0; cursor: pointer; font-size: 16px;">Выбрать все</label>
+                        <span id="selected-files-count" style="color: #546e7a; font-size: 14px; margin-left: auto;">Выбрано: 0</span>
+                    </div>
+                </div>
+                
+                <div id="files-list-container" style="display: none;">
+                    <div id="files-list" style="display: flex; flex-direction: column; gap: 10px;">
+                    </div>
+                </div>
+                
+                <div id="files-status" style="margin-top: 15px;"></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/files.js"></script>
+</body>
+</html>
+

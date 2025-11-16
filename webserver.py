@@ -2,7 +2,7 @@ import os
 import base64
 from typing import List
 from fastapi import FastAPI, Request, Form, File, UploadFile, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from dotenv import load_dotenv
@@ -52,48 +52,6 @@ async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request, "genres": genres, "genres_data": genres_data})
 
 
-@app.get("/files")
-async def get_files(genre: str = None):
-    folder = OUTPUT_FOLDER if os.path.exists(OUTPUT_FOLDER) else MUSIC_FOLDER
-    genres, files_by_genre = scan_music_folder(folder)
-    
-    if genre:
-        files = files_by_genre.get(genre, [])
-    else:
-        files = []
-        for genre_files in files_by_genre.values():
-            files.extend(genre_files)
-    
-    result = []
-    for file_path in files:
-        rel_path = get_relative_path(file_path, folder)
-        tags = read_tags(file_path)
-        has_cover_flag = has_cover(file_path)
-        
-        cover_data = None
-        if has_cover_flag:
-            cover_bytes = get_cover_data(file_path)
-            if cover_bytes:
-                cover_data = base64.b64encode(cover_bytes).decode('utf-8')
-        
-        result.append({
-            "path": rel_path,
-            "full_path": file_path,
-            "title": tags.get('title', ''),
-            "artist": tags.get('artist', ''),
-            "album": tags.get('album', ''),
-            "genre": tags.get('genre', ''),
-            "year": tags.get('year', ''),
-            "comment": tags.get('comment', ''),
-            "lyrics": tags.get('lyrics', ''),
-            "original_artist": tags.get('original_artist', ''),
-            "copyright": tags.get('copyright', ''),
-            "encoder": tags.get('encoder', ''),
-            "has_cover": has_cover_flag,
-            "cover_data": cover_data
-        })
-    
-    return JSONResponse(content={"files": result})
 
 
 @app.post("/edit")
@@ -702,6 +660,175 @@ async def process_selected_files(files: str = Form(...)):
         "errors": errors
     })
 
+
+@app.get("/files", response_class=HTMLResponse)
+async def files_page(request: Request):
+    """Страница управления файлами"""
+    genres_data = load_genres()
+    genres = list(genres_data.keys())
+    return templates.TemplateResponse("files.html", {"request": request, "genres": genres})
+
+@app.get("/files-api")
+async def get_files_api(genre: str = None):
+    """API для получения списка файлов"""
+    try:
+        folder = OUTPUT_FOLDER if os.path.exists(OUTPUT_FOLDER) else MUSIC_FOLDER
+        
+        if not os.path.exists(folder):
+            return JSONResponse(content={"files": [], "error": f"Папка не найдена: {folder}"})
+        
+        genres, files_by_genre = scan_music_folder(folder)
+        
+        if genre:
+            files = files_by_genre.get(genre, [])
+        else:
+            files = []
+            for genre_files in files_by_genre.values():
+                files.extend(genre_files)
+        
+        result = []
+        for file_path in files:
+            try:
+                rel_path = get_relative_path(file_path, folder)
+                if not rel_path:
+                    continue
+                
+                tags = {}
+                has_cover_flag = False
+                cover_data = None
+                
+                try:
+                    tags = read_tags(file_path) or {}
+                    has_cover_flag = has_cover(file_path)
+                    
+                    if has_cover_flag:
+                        try:
+                            cover_bytes = get_cover_data(file_path)
+                            if cover_bytes:
+                                cover_data = base64.b64encode(cover_bytes).decode('utf-8')
+                        except:
+                            pass
+                except:
+                    pass
+                
+                result.append({
+                    "path": rel_path,
+                    "full_path": file_path,
+                    "title": tags.get('title', ''),
+                    "artist": tags.get('artist', ''),
+                    "album": tags.get('album', ''),
+                    "genre": tags.get('genre', ''),
+                    "year": tags.get('year', ''),
+                    "comment": tags.get('comment', ''),
+                    "lyrics": tags.get('lyrics', ''),
+                    "original_artist": tags.get('original_artist', ''),
+                    "copyright": tags.get('copyright', ''),
+                    "encoder": tags.get('encoder', ''),
+                    "has_cover": has_cover_flag,
+                    "cover_data": cover_data
+                })
+            except Exception as e:
+                continue
+        
+        return JSONResponse(content={"files": result})
+    except Exception as e:
+        return JSONResponse(content={"files": [], "error": str(e)})
+
+@app.get("/download-file")
+async def download_file(file_path: str):
+    """Скачать один файл"""
+    folder = OUTPUT_FOLDER if os.path.exists(OUTPUT_FOLDER) else MUSIC_FOLDER
+    full_path = get_file_path(file_path, folder)
+    
+    if not full_path or not os.path.exists(full_path):
+        raise HTTPException(status_code=404, detail="Файл не найден")
+    
+    if not os.path.isfile(full_path):
+        raise HTTPException(status_code=400, detail="Указанный путь не является файлом")
+    
+    return FileResponse(
+        path=full_path,
+        filename=os.path.basename(full_path),
+        media_type='audio/mpeg'
+    )
+
+@app.post("/download-files")
+async def download_files(files: str = Form(...)):
+    """Скачать несколько файлов в ZIP архиве"""
+    import zipfile
+    import tempfile
+    import json
+    import io
+    
+    try:
+        file_paths = json.loads(files)
+        if not isinstance(file_paths, list) or len(file_paths) == 0:
+            raise HTTPException(status_code=400, detail="Не указаны файлы для скачивания")
+        
+        folder = OUTPUT_FOLDER if os.path.exists(OUTPUT_FOLDER) else MUSIC_FOLDER
+        
+        zip_buffer = io.BytesIO()
+        
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for rel_path in file_paths:
+                full_path = get_file_path(rel_path, folder)
+                if full_path and os.path.exists(full_path) and os.path.isfile(full_path):
+                    zipf.write(full_path, os.path.basename(full_path))
+        
+        zip_buffer.seek(0)
+        
+        return StreamingResponse(
+            io.BytesIO(zip_buffer.read()),
+            media_type='application/zip',
+            headers={
+                'Content-Disposition': 'attachment; filename="acoverflow_files.zip"'
+            }
+        )
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Неверный формат JSON")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Ошибка создания архива: {str(e)}")
+
+@app.post("/delete-files")
+async def delete_files(files: str = Form(...)):
+    """Удалить несколько файлов"""
+    import json
+    
+    try:
+        file_paths = json.loads(files)
+        if not isinstance(file_paths, list) or len(file_paths) == 0:
+            raise HTTPException(status_code=400, detail="Не указаны файлы для удаления")
+        
+        folder = OUTPUT_FOLDER if os.path.exists(OUTPUT_FOLDER) else MUSIC_FOLDER
+        
+        deleted = []
+        errors = []
+        
+        for rel_path in file_paths:
+            full_path = get_file_path(rel_path, folder)
+            if full_path and os.path.exists(full_path):
+                try:
+                    if os.path.isfile(full_path):
+                        os.remove(full_path)
+                        deleted.append(rel_path)
+                    else:
+                        errors.append(f"{rel_path}: не является файлом")
+                except Exception as e:
+                    errors.append(f"{rel_path}: {str(e)}")
+            else:
+                errors.append(f"{rel_path}: файл не найден")
+        
+        return JSONResponse(content={
+            "success": True,
+            "deleted": deleted,
+            "errors": errors,
+            "deleted_count": len(deleted),
+            "errors_count": len(errors)
+        })
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Неверный формат JSON")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Ошибка удаления файлов: {str(e)}")
 
 @app.get("/prompts", response_class=HTMLResponse)
 async def prompts_page(request: Request):

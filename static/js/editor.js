@@ -13,15 +13,20 @@ document.getElementById('cover-file').addEventListener('change', handleCoverPrev
 
 function loadFiles() {
     const genre = document.getElementById('genre-select').value;
-    const url = genre ? `/files?genre=${encodeURIComponent(genre)}` : '/files';
+    const url = '/files-api' + (genre ? `?genre=${encodeURIComponent(genre)}` : '');
     
     // Очищаем выбранные файлы при загрузке нового списка
     selectedFiles.clear();
     
     fetch(url)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
-            allFiles = data.files;
+            allFiles = data.files || [];
             displayFiles(allFiles);
         })
         .catch(error => {

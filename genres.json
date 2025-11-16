@@ -124,5 +124,12 @@
       "Dream Fog": "Foggy abstract shapes with desaturated colors.",
       "Silent Waves": "Barely visible soft wave forms in dark tones."
     }
+  },
+  "ААА": {
+    "description": "ААА",
+    "substyles": {
+      "АА": "А"
+    },
+    "prompts": []
   }
 }
