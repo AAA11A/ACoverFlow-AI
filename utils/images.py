@@ -64,7 +64,7 @@ Abstract, atmospheric, soft lighting, high quality."""
             n=1,
         )
         
-        image_url = response.data[0].url
+        image_url = response.data[0].url if hasattr(response.data[0], 'url') else response.data[0].model_dump().get('url')
         
         import requests
         
