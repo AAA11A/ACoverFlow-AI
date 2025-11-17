@@ -14,7 +14,7 @@ pip install -r requirements.txt
 OPENAI_API_KEY=your_openai_api_key_here
 MUSIC_FOLDER=D:\music_source
 OUTPUT_FOLDER=D:\music_with_covers
-WEB_PORT=3003
+WEB_PORT=3004
 ```
 
 **Важно:** Замените `your_openai_api_key_here` на ваш реальный API ключ OpenAI.
@@ -52,7 +52,7 @@ python generate_covers.py
 python webserver.py
 ```
 
-Откройте в браузере: http://localhost:3003
+Откройте в браузере: http://localhost:3004
 
 ## 5. Проверка работы
 

@@ -9,9 +9,9 @@ COPY . .
 
 ENV MUSIC_FOLDER=/music_source
 ENV OUTPUT_FOLDER=/music_output
-ENV WEB_PORT=3003
+ENV WEB_PORT=3004
 
-EXPOSE 3003
+EXPOSE 3004
 
 CMD ["python", "webserver.py"]
 

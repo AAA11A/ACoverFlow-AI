@@ -1,6 +1,7 @@
 import os
 import base64
 from typing import List
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, Form, File, UploadFile, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -18,10 +19,9 @@ load_dotenv()
 
 MUSIC_FOLDER = os.getenv('MUSIC_FOLDER', os.path.join(os.path.expanduser('~'), 'music_source'))
 OUTPUT_FOLDER = os.getenv('OUTPUT_FOLDER', os.path.join(os.path.expanduser('~'), 'music_with_covers'))
-WEB_PORT = int(os.getenv('WEB_PORT', '3003'))
+WEB_PORT = int(os.getenv('WEB_PORT', '3004'))
+WEB_HOST = os.getenv('WEB_HOST', '0.0.0.0')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
-
-app = FastAPI()
 
 def create_all_genre_folders():
     genres_data = load_genres()
@@ -30,9 +30,12 @@ def create_all_genre_folders():
     for genre in genres_data.keys():
         ensure_output_folder(OUTPUT_FOLDER, genre)
 
-@app.on_event("startup")
-async def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     create_all_genre_folders()
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
@@ -973,5 +976,5 @@ async def delete_genre(genre_name: str):
 
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=WEB_PORT)
+    uvicorn.run(app, host=WEB_HOST, port=WEB_PORT)
 

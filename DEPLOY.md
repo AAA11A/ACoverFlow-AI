@@ -35,7 +35,7 @@ nano /opt/acoverflow-ai/.env
 ```env
 MUSIC_FOLDER=/var/music_source
 OUTPUT_FOLDER=/var/music_with_covers
-WEB_PORT=3003
+WEB_PORT=3004
 OPENAI_API_KEY=sk-your-actual-api-key-here
 ```
 
@@ -91,7 +91,7 @@ nano .env
 ```env
 MUSIC_FOLDER=/var/music_source
 OUTPUT_FOLDER=/var/music_with_covers
-WEB_PORT=3003
+WEB_PORT=3004
 OPENAI_API_KEY=your_api_key_here
 ```
 
@@ -145,7 +145,7 @@ server {
     client_max_body_size 100M;
 
     location / {
-        proxy_pass http://127.0.0.1:3003;
+        proxy_pass http://127.0.0.1:3004;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -228,7 +228,7 @@ certbot --nginx -d your-domain.com
 ### Проверка портов
 
 ```bash
-netstat -tlnp | grep 3003
+netstat -tlnp | grep 3004
 ```
 
 ### Проверка логов Nginx

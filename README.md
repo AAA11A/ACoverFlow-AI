@@ -25,7 +25,7 @@ pip install -r requirements.txt
 OPENAI_API_KEY=your_api_key_here
 MUSIC_FOLDER=D:\music_source
 OUTPUT_FOLDER=D:\music_with_covers
-WEB_PORT=3003
+WEB_PORT=3004
 ```
 
 ## Запуск
@@ -56,10 +56,10 @@ python webserver.py
 Или через uvicorn:
 
 ```bash
-uvicorn webserver:app --host 0.0.0.0 --port 3003
+uvicorn webserver:app --host 0.0.0.0 --port 3004
 ```
 
-Откройте в браузере: `http://localhost:3003`
+Откройте в браузере: `http://localhost:3004`
 
 ## Docker
 
@@ -76,7 +76,7 @@ docker run --rm ^
   -e OPENAI_API_KEY=your_api_key ^
   -v D:\music_source:/music_source ^
   -v D:\music_with_covers:/music_output ^
-  -p 3003:3003 ^
+  -p 3004:3004 ^
   mp3-cover-system
 ```
 
@@ -87,7 +87,7 @@ docker run --rm \
   -e OPENAI_API_KEY=your_api_key \
   -v /path/to/music_source:/music_source \
   -v /path/to/music_with_covers:/music_output \
-  -p 3003:3003 \
+  -p 3004:3004 \
   mp3-cover-system
 ```
 
@@ -162,7 +162,7 @@ project/
 
 Пример:
 ```bash
-curl http://localhost:3003/files?genre=Ambient
+curl http://localhost:3004/files?genre=Ambient
 ```
 
 ### POST /edit
@@ -175,7 +175,7 @@ curl http://localhost:3003/files?genre=Ambient
 
 Пример:
 ```bash
-curl -X POST http://localhost:3003/edit \
+curl -X POST http://localhost:3004/edit \
   -F "files=[\"Ambient/track1.mp3\"]" \
   -F "title=New Title" \
   -F "artist=New Artist"
@@ -233,7 +233,7 @@ curl -X POST http://localhost:3003/edit \
 INFO:     Started server process
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-INFO:     Uvicorn running on http://0.0.0.0:3003
+INFO:     Uvicorn running on http://0.0.0.0:3004
 INFO:     127.0.0.1:52341 - "GET / HTTP/1.1" 200 OK
 INFO:     127.0.0.1:52341 - "GET /files?genre=Ambient HTTP/1.1" 200 OK
 INFO:     127.0.0.1:52341 - "POST /edit HTTP/1.1" 200 OK
